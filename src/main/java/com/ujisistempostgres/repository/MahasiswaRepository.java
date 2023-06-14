@@ -5,8 +5,8 @@ import com.ujisistempostgres.entity.Mahasiswa;
 import java.util.List;
 
 public interface MahasiswaRepository {
-    int save(Mahasiswa book);
-    int update(Mahasiswa book);
+    int save(Mahasiswa mahasiswa);
+    int update(Mahasiswa mahasiswa);
     Mahasiswa findByNim(int nim);
     int deleteByNim(int nim);
     List<Mahasiswa> findAll();

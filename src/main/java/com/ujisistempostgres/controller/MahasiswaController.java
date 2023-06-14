@@ -40,7 +40,7 @@ public class MahasiswaController {
                 int nim = resultSet.getInt("nim");
                 String newAlamat = resultSet.getString("alamat");
                 String nama = resultSet.getString("nama");
-                Mahasiswa mahasiswa = new Mahasiswa(nim, newAlamat, nama);
+                Mahasiswa mahasiswa = new Mahasiswa(nim, nama, newAlamat);
                 mahasiswas.add(mahasiswa);
             }
 
@@ -83,9 +83,12 @@ public class MahasiswaController {
     public ResponseEntity<String> createMahasiswa(@RequestBody Mahasiswa mahasiswa) {
         try {
             Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement("INSERT INTO mahasiswa (nama, alamat) VALUES (?, ?)");
-            statement.setString(1, mahasiswa.getNama());
-            statement.setString(2, mahasiswa.getAlamat());
+            PreparedStatement statement = connection.prepareStatement("INSERT INTO mahasiswa (nim, nama, alamat) VALUES (?, ?, ?)");
+            statement.setInt(1, mahasiswa.getNim());
+            statement.setString(2, mahasiswa.getNama());
+            statement.setString(3, mahasiswa.getAlamat());
+
+
 
             statement.executeUpdate();
             connection.close();
