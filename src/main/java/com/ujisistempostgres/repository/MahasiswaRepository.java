@@ -26,17 +26,17 @@ public class MahasiswaRepository {
     }
 
     public void insertMahasiswa(Mahasiswa mahasiswa) {
-        String sql = "INSERT INTO mahasiswa (nim, nama, alamat) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, mahasiswa.getNim(), mahasiswa.getNama(), mahasiswa.getAlamat());
+        String sql = "INSERT INTO mahasiswa (nim, nama, alamat) VALUES ("+ mahasiswa.getNim() +", '"+ mahasiswa.getNama() +"', '"+ mahasiswa.getAlamat() +"')";
+        jdbcTemplate.update(sql);
     }
 
     public void deleteMahasiswa(int nim) {
-        String sql = "DELETE FROM mahasiswa WHERE nim = ?";
-        jdbcTemplate.update(sql, nim);
+        String sql = "DELETE FROM mahasiswa WHERE nim = " + nim;
+        jdbcTemplate.update(sql);
     }
 
     public void updateTask(Mahasiswa mahasiswa) {
-        String sql = "UPDATE mahasiswa SET nama = ?, alamat = ? WHERE nim = ?";
-        jdbcTemplate.update(sql, mahasiswa.getNama(), mahasiswa.getAlamat(), mahasiswa.getNim());
+        String sql = "UPDATE mahasiswa SET nama = "+ mahasiswa.getNama() +", alamat = "+ mahasiswa.getAlamat() +" WHERE nim = "+ mahasiswa.getNim();
+        jdbcTemplate.update(sql);
     }
 }
