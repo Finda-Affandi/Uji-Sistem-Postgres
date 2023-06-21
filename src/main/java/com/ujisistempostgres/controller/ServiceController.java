@@ -2,6 +2,7 @@ package com.ujisistempostgres.controller;
 
 import com.ujisistempostgres.entity.Mahasiswa;
 import com.ujisistempostgres.repository.MahasiswaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,10 +10,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api")
-public class EntityController {
+public class ServiceController {
     private final MahasiswaRepository mahasiswaRepository;
 
-    public EntityController(MahasiswaRepository mahasiswaRepository) {
+    @Autowired
+    public ServiceController(MahasiswaRepository mahasiswaRepository) {
         this.mahasiswaRepository = mahasiswaRepository;
     }
 
