@@ -2,6 +2,8 @@ package com.ujisistempostgres.controller;
 
 import com.ujisistempostgres.repository.MahasiswaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +21,14 @@ public class ServiceController {
     }
 
     @GetMapping("/mahasiswa")
-    public List<Map<String, Object>> getAllMahasiswa() {
-        return mahasiswaRepository.getAllMahasiswa();
+    public ResponseEntity<List<Map<String, Object>>> getAllMahasiswa() {
+        try {
+            List<Map<String, Object>> mahasiswaList = mahasiswaRepository.getAllMahasiswa();
+            return ResponseEntity.ok(mahasiswaList);
+        } catch (Exception e) {
+            // Handle the exception and return an appropriate response status
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PostMapping("/mahasiswa")
