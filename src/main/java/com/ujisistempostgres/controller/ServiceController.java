@@ -24,9 +24,12 @@ public class ServiceController {
     }
 
     @PostMapping("/mahasiswa")
-    public void createMahasiswa(@RequestBody Map<String, Object> mahasiswa) {
-        mahasiswaRepository.insertMahasiswa(mahasiswa);
+    public void createMahasiswa(@RequestBody List<Map<String, Object>> mahasiswaList) {
+        for (Map<String, Object> mahasiswa : mahasiswaList) {
+            mahasiswaRepository.insertMahasiswa(mahasiswa);
+        }
     }
+
 
 //    @DeleteMapping("/mahasiswa/{nim}")
 //    public void deleteTask(@PathVariable("nim") int nim) {
