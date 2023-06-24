@@ -1,6 +1,6 @@
 package com.ujisistempostgres.controller;
 
-import com.ujisistempostgres.repository.MahasiswaRepository;
+import com.ujisistempostgres.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +13,18 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class ServiceController {
-    private final MahasiswaRepository mahasiswaRepository;
+    private final ServiceRepository serviceRepository;
 
     @Autowired
-    public ServiceController(MahasiswaRepository mahasiswaRepository) {
-        this.mahasiswaRepository = mahasiswaRepository;
+    public ServiceController(ServiceRepository serviceRepository) {
+        this.serviceRepository = serviceRepository;
     }
 
-    @GetMapping("/mahasiswa")
-    public ResponseEntity<List<Map<String, Object>>> getAllMahasiswa() {
+    @GetMapping("/postgres")
+    public ResponseEntity<List<Map<String, Object>>> getAllData() {
         try {
-            List<Map<String, Object>> mahasiswaList = mahasiswaRepository.getAllMahasiswa();
-            return ResponseEntity.ok(mahasiswaList);
+            List<Map<String, Object>> dataList = serviceRepository.getAllData();
+            return ResponseEntity.ok(dataList);
         } catch (Exception e) {
             // Handle the exception and return an appropriate response status
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -32,9 +32,9 @@ public class ServiceController {
     }
 
     @PostMapping("/mahasiswa")
-    public void createMahasiswa(@RequestBody List<Map<String, Object>> mahasiswaList) {
-        for (Map<String, Object> mahasiswa : mahasiswaList) {
-            mahasiswaRepository.insertMahasiswa(mahasiswa);
+    public void insertData(@RequestBody List<Map<String, Object>> dataList) {
+        for (Map<String, Object> data : dataList) {
+            serviceRepository.insertData(data);
         }
     }
 
