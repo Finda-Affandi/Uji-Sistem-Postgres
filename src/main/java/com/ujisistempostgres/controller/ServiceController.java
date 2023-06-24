@@ -26,27 +26,24 @@ public class ServiceController {
             List<Map<String, Object>> dataList = serviceRepository.getAllData();
             return ResponseEntity.ok(dataList);
         } catch (Exception e) {
-            // Handle the exception and return an appropriate response status
+            String eMessage = "An error while retrieving data";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping("/mahasiswa")
-    public void insertData(@RequestBody List<Map<String, Object>> dataList) {
-        for (Map<String, Object> data : dataList) {
-            serviceRepository.insertData(data);
+    @PostMapping("/postgres")
+    public ResponseEntity<String> insertData(@RequestBody List<Map<String, Object>> dataList) {
+        try {
+            for (Map<String, Object> data : dataList) {
+//            serviceRepository.insertData(data);
+                System.out.println(data.keySet());
+                System.out.println(data.values());
+            }
+            return ResponseEntity.ok("Data inserted succesfully!");
+        } catch (Exception e) {
+            String eMessage = "Faied to insert data!";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(eMessage);
         }
     }
-
-
-//    @DeleteMapping("/mahasiswa/{nim}")
-//    public void deleteTask(@PathVariable("nim") int nim) {
-//        mahasiswaRepository.deleteMahasiswa(nim);
-//    }
-//
-//    @PutMapping("/mahasiswa/{nim}")
-//    public void updateTask(@PathVariable("nim") int nim, @RequestBody Mahasiswa mahasiswa) {
-//        mahasiswa.setNim(nim);
-//        mahasiswaRepository.updateTask(mahasiswa);
-//    }
 }
