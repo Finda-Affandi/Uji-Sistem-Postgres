@@ -35,9 +35,7 @@ public class ServiceController {
     public ResponseEntity<String> insertData(@RequestBody List<Map<String, Object>> dataList) {
         try {
             for (Map<String, Object> data : dataList) {
-//            serviceRepository.insertData(data);
-                System.out.println(data.keySet());
-                System.out.println(data.values());
+                serviceRepository.insertData(data);
             }
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {

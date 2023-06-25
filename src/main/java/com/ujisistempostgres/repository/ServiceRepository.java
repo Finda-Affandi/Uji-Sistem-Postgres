@@ -18,7 +18,7 @@ public class ServiceRepository {
     }
 
     public List<Map<String, Object>> getAllData() {
-        String tableName = "mahasiswa";
+        String tableName = "saleslineframe";
         String sql = String.format("SELECT * FROM %s", tableName);
         return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
             ResultSetMetaData metaData = resultSet.getMetaData();
@@ -36,7 +36,7 @@ public class ServiceRepository {
     }
 
     public void insertData(Map<String, Object> dataMap) {
-        String tableName = "mahasiswa";
+        String tableName = "saleslineframe";
         String columns = String.join(", ", dataMap.keySet());
         String placeholders = String.join(", ", Collections.nCopies(dataMap.size(), "?"));
 
