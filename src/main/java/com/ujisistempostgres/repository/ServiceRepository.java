@@ -58,8 +58,25 @@ public class ServiceRepository {
         jdbcTemplate.batchUpdate(sql, batchParams);
     }
 
-    public String createTable(List<String> columns) {
-        String tableName = "saleslineframe";
+    public List<String> getAllTableNames() {
+        String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
+        return jdbcTemplate.queryForList(query, String.class);
+    }
+
+    public List<String> getColumnList(String table) {
+        String sql = "SELECT column_name FROM information_schema.columns WHERE table_name = ?";
+        List<String> columnList = new ArrayList<>();
+
+        jdbcTemplate.query(sql, new Object[]{table}, (rs, rowNum) -> {
+            String columnName = rs.getString("column_name");
+            columnList.add(columnName);
+            return null;
+        });
+
+        return columnList;
+    }
+
+    public String createTable(List<String> columns, String tableName) {
         List<String> column = new ArrayList<>();
 
         for (String col : columns) {
