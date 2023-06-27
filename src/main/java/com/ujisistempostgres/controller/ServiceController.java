@@ -1,5 +1,6 @@
 package com.ujisistempostgres.controller;
 
+import com.ujisistempostgres.datamapping.DataMappingJson;
 import com.ujisistempostgres.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ public class ServiceController {
     @PostMapping("/postgres")
     public ResponseEntity<String> insertData(@RequestBody List<Map<String, Object>> dataList) {
         try {
+            dataList = DataMappingJson.transformData(dataList);
 //            for (Map<String, Object> data : dataList) {
 //                serviceRepository.insertData(data);
 //            }
@@ -43,7 +45,8 @@ public class ServiceController {
                 key.addAll(data.keySet());
                 break;
             }
-            String tableName = serviceRepository.createTable(key);
+            System.out.println(dataList);
+            String tableName = serviceRepository.createTable(dataList);
             serviceRepository.insertData(dataList, tableName);
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {
