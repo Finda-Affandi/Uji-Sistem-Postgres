@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +35,16 @@ public class ServiceController {
     @PostMapping("/postgres")
     public ResponseEntity<String> insertData(@RequestBody List<Map<String, Object>> dataList) {
         try {
+//            for (Map<String, Object> data : dataList) {
+//                serviceRepository.insertData(data);
+//            }
+            List<String> key = new ArrayList<>();
             for (Map<String, Object> data : dataList) {
-                serviceRepository.insertData(data);
+                key.addAll(data.keySet());
+                break;
             }
+            String tableName = serviceRepository.createTable(key);
+            serviceRepository.insertData(dataList, tableName);
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {
             String eMessage = "Faied to insert data!";
