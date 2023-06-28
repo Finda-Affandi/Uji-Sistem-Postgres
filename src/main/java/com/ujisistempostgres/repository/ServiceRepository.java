@@ -58,37 +58,57 @@ public class ServiceRepository {
         jdbcTemplate.batchUpdate(sql, batchParams);
     }
 
-    public List<String> getAllTableNames() {
-        String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
-        return jdbcTemplate.queryForList(query, String.class);
-    }
+//    public String createTable(List<String> columns) {
+//        String tableName = "saleslineframe";
+//        List<String> column = new ArrayList<>();
+//
+//        for (String col : columns) {
+//            String sqlCol = col + " VARCHAR(100)";
+//            column.add(sqlCol);
+//        }
+//
+//        String cols = String.join(", ", column);
+//
+//        String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, cols);
+//        jdbcTemplate.update(sql);
+//
+//        return tableName;
+//    }
 
-    public List<String> getColumnList(String table) {
-        String sql = "SELECT column_name FROM information_schema.columns WHERE table_name = ?";
-        List<String> columnList = new ArrayList<>();
+    public String createTable(List<Map<String, Object>> dataList) {
+        String tableName = "saleslineframe";
+        List<String> columns = new ArrayList<>();
 
-        jdbcTemplate.query(sql, new Object[]{table}, (rs, rowNum) -> {
-            String columnName = rs.getString("column_name");
-            columnList.add(columnName);
-            return null;
-        });
+        // Mendapatkan nama kolom dan tipe datanya dari dataList
+        if (!dataList.isEmpty()) {
+            Map<String, Object> firstData = dataList.get(0);
+            for (Map.Entry<String, Object> entry : firstData.entrySet()) {
+                String columnName = entry.getKey();
+                Object columnValue = entry.getValue();
 
-        return columnList;
-    }
-
-    public String createTable(List<String> columns, String tableName) {
-        List<String> column = new ArrayList<>();
-
-        for (String col : columns) {
-            String sqlCol = col + " VARCHAR(100)";
-            column.add(sqlCol);
+                String sqlType = getSqlType(columnValue);
+                String sqlColumn = columnName + " " + sqlType;
+                columns.add(sqlColumn);
+            }
         }
 
-        String cols = String.join(", ", column);
+        String cols = String.join(", ", columns);
 
-        String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, cols);
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%s)", tableName, cols);
         jdbcTemplate.update(sql);
-
         return tableName;
     }
+
+    private String getSqlType(Object value) {
+        if (value instanceof String) {
+            return "VARCHAR(100)";
+        } else if (value instanceof Integer) {
+            return "INT";
+        } else if (value instanceof Float) {
+            return "FLOAT8";
+        }
+        // Tambahkan kondisi untuk tipe data lainnya jika diperlukan
+        return "VARCHAR(100)"; // Default: Tipe data VARCHAR(100)
+    }
+
 }
