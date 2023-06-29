@@ -76,7 +76,7 @@ public class ServiceRepository {
         return columnList;
     }
 
-    public String createTable(List<String> columns, String tableName) {
+    public void createTable(List<String> columns, String tableName) {
         List<String> column = new ArrayList<>();
 
         for (String col : columns) {
@@ -88,7 +88,11 @@ public class ServiceRepository {
 
         String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, cols);
         jdbcTemplate.update(sql);
+    }
 
-        return tableName;
+    public void createTableWithMap(List<String> columns, String tableName) {
+        String column = String.join(",", columns);
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, column);
+        jdbcTemplate.update(sql);
     }
 }

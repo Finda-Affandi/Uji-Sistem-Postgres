@@ -2,6 +2,7 @@ package com.ujisistempostgres.controller;
 
 import com.ujisistempostgres.compareter.CompareList;
 import com.ujisistempostgres.converter.listToLowercase;
+import com.ujisistempostgres.mapper.MapReader;
 import com.ujisistempostgres.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -40,16 +41,12 @@ public class ServiceController {
             @RequestHeader HttpHeaders headers,
             @RequestBody List<Map<String, Object>> dataList) {
         try {
-//            for (Map<String, Object> data : dataList) {
-//                serviceRepository.insertData(data);
-//            }
+            System.out.println(dataList);
             List<String> key = new ArrayList<>();
             for (Map<String, Object> data : dataList) {
                 key.addAll(data.keySet());
                 break;
             }
-//           serviceRepository.createTable(key);
-//           serviceRepository.insertData(dataList, tableName);
             //Change column name from csv into lowercase
             listToLowercase convToLow = new listToLowercase();
             List<String> lowKey = convToLow.listLowercase(key);
@@ -59,7 +56,6 @@ public class ServiceController {
 
             //List for get compare result
             List<Boolean> isDuplicate = new ArrayList<>();
-            System.out.println(tableName);
             for (String table : tableName) {
                 List<String> column = convToLow.listLowercase(serviceRepository.getColumnList(table));
                 boolean cmpr = CompareList.compareLists(lowKey, column);
@@ -68,11 +64,6 @@ public class ServiceController {
                 } else {
                     isDuplicate.add(false);
                 }
-//                System.out.println("db");
-//                System.out.println(column);
-//                System.out.println("json");
-//                System.out.println(upKey);
-//                System.out.println("\n\n");
             }
 
             //Check is column in database dublicate
@@ -82,17 +73,31 @@ public class ServiceController {
             String newTableName = headers.getFirst("tableName");
 
             //Create new table if table column name is not duplicate, and insert data into exsisting table if table column name duplicate
-            if (createTable) {
-                String table = serviceRepository.createTable(key, newTableName);
-                serviceRepository.insertData(dataList, table);
-            } else {
-                serviceRepository.insertData(dataList, newTableName);
-            }
+//            if (createTable) {
+//                MapReader mapReader = new MapReader();
+//                String fileName = mapReader.cmprMapper(lowKey);
+//                System.out.println(fileName);
+//                if (fileName != null) {
+//                    List<String> columnList = mapReader.mapping(fileName);
+//                    serviceRepository.createTableWithMap(columnList, newTableName);
+//                } else {
+//                    serviceRepository.createTable(key, newTableName);
+//                    serviceRepository.insertData(dataList, newTableName);
+//                }
+//            } else {
+//                serviceRepository.insertData(dataList, newTableName);
+//            }
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {
             String eMessage = "Failed to insert data!";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(eMessage);
         }
+    }
+
+    @PostMapping("/coba")
+    public void cobah(){
+//        MapReader cb = new MapReader();
+//        cb.cmprMapper();
     }
 }

@@ -1,0 +1,4 @@
+columnName,typeData
+kkk,int NOT NULL
+bbb,varchar(100)
+PRIMARY KEY,(kkk)
