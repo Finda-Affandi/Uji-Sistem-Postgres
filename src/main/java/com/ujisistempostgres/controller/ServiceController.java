@@ -102,8 +102,7 @@ public class ServiceController {
     }
 
     @PostMapping("/coba")
-    public void cobah(){
-//        MapReader cb = new MapReader();
-//        cb.cmprMapper();
+    public void cobah(@RequestBody List<Map<String, Object>> dataList){
+        serviceRepository.mencoba(dataList);
     }
 }

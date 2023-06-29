@@ -1,5 +1,6 @@
 package com.ujisistempostgres.repository;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -41,21 +42,60 @@ public class ServiceRepository {
 //        jdbcTemplate.update(sql, dataMap.values().toArray());
 //    }
 
-    public void insertData(List<Map<String, Object>> dataList, String tableName) {
-        String columns = String.join(", ", dataList.get(0).keySet());
+//    public void insertData(List<Map<String, Object>> dataList, String tableName) {
+//        try {
+//            if (dataList.isEmpty()) {
+//                System.out.println("Data list is empty.");
+//                return;
+//            }
+//
+//            Map<String, Object> firstRow = dataList.get(0);
+//            String columns = String.join(", ", firstRow.keySet());
+//            String placeholders = String.join(", ", Collections.nCopies(firstRow.size(), "?"));
+//
+//            List<Object[]> batchParams = new ArrayList<>();
+//            for (Map<String, Object> dataMap : dataList) {
+//                Object[] values = dataMap.values().toArray();
+//                batchParams.add(values);
+//            }
+//
+//            String sql = String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
+//            jdbcTemplate.batchUpdate(sql, batchParams);
+//        } catch (DataAccessException e) {
+//            System.out.println("Error executing SQL statement: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
 
-        List<Object[]> batchParams = new ArrayList<>();
+    public void insertData(List<Map<String,Object>> dataList, String tableName) {
+        List<String> column = new ArrayList<>();
+        for (Map<String, Object> data : dataList) {
+            column.addAll(data.keySet());
+            break;
+        }
+        String colName = String.join(",", column);
+        String template = "INSERT INTO" + " " + tableName + " " + "(" + colName +")";
 
-        for (Map<String, Object> dataMap : dataList) {
-            Object[] values = dataMap.values().toArray();
-            batchParams.add(values);
+        List<String> allValue = new ArrayList<>();
+        List<String> value = new ArrayList<>();
+        for (Map<String, Object> data : dataList) {
+            value.clear();
+            for (Object obj : data.values()) {
+                value.add("'" + obj.toString() + "'");
+            }
+            String joinValue = String.join(",", value);
+            String wrapValue = "(" + joinValue +")";
+
+            allValue.add(wrapValue);
         }
 
-        String placeholders = String.join(", ", Collections.nCopies(dataList.get(0).size(), "?"));
+        String joinAllValue = String.join(",", allValue);
 
-        String sql = String.format("INSERT INTO %s (%s) VALUES (%s)", tableName, columns, placeholders);
+        String sql = template + " VALUES " + joinAllValue;
 
-        jdbcTemplate.batchUpdate(sql, batchParams);
+        jdbcTemplate.batchUpdate(sql);
+
+        System.out.println(sql);
     }
 
     public List<String> getAllTableNames() {
@@ -93,6 +133,46 @@ public class ServiceRepository {
     public void createTableWithMap(List<String> columns, String tableName) {
         String column = String.join(",", columns);
         String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, column);
+        System.out.println("Succes create table");
         jdbcTemplate.update(sql);
+    }
+
+    public void mencoba(List<Map<String, Object>> dataList) {
+        String insert = "INSERT INTO";
+        String table = "tb_cb";
+
+
+
+
+        List<String> column = new ArrayList<>();
+        for (Map<String, Object> data : dataList) {
+            column.addAll(data.keySet());
+            break;
+        }
+        String colName = String.join(",", column);
+        String template = insert + " " + table + " " + "(" + colName +")";
+
+        List<String> allValue = new ArrayList<>();
+        List<String> value = new ArrayList<>();
+        for (Map<String, Object> data : dataList) {
+            value.clear();
+            for (Object obj : data.values()) {
+                value.add("'" + obj.toString() + "'");
+            }
+            String joinValue = String.join(",", value);
+            String wrapValue = "(" + joinValue +")";
+
+            allValue.add(wrapValue);
+        }
+
+        String joinAllValue = String.join(",", allValue);
+
+        String sql = template + " VALUES " + joinAllValue;
+
+        System.out.println(sql);
+
+
+
+//        System.out.println(sql);
     }
 }
