@@ -26,9 +26,7 @@ public class MapReader {
         for (Map<String, Object> result : mapResult) {
             columnList.add(result.get("columnName").toString() + " " + result.get("typeData"));
         }
-        for (String x : columnList) {
-            System.out.println(x);
-        }
+        System.out.println("mapping");
         return columnList;
     }
 
@@ -53,6 +51,7 @@ public class MapReader {
             boolean cmpr = CompareList.compareLists(lowCol, convToLow.listLowercase(colMap));
 
             if (cmpr) {
+                System.out.println("match");
                 fileMap = file;
                 break;
             }

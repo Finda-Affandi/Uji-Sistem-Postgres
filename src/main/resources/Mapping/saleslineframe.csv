@@ -1,6 +1,6 @@
 columnName,typeData
-CMPNYCD,varchar(100)
-RCVNO,varchar(100)
+CMPNYCD,varchar
+RCVNO,varchar
 LINEID,int
 ORDER_LINE_NUMBER,int
 ORDER_FRAME_MAKER,varchar

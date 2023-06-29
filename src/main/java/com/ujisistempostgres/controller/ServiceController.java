@@ -41,7 +41,12 @@ public class ServiceController {
             @RequestHeader HttpHeaders headers,
             @RequestBody List<Map<String, Object>> dataList) {
         try {
-            System.out.println(dataList);
+//
+//            for (Map<String, Object> data : dataList) {
+//                System.out.println(data);
+//            }
+
+
             List<String> key = new ArrayList<>();
             for (Map<String, Object> data : dataList) {
                 key.addAll(data.keySet());
@@ -70,23 +75,24 @@ public class ServiceController {
             boolean createTable = !isDuplicate.contains(true);
 
             //Get table name from request header (Based csv filename)
-            String newTableName = headers.getFirst("tableName");
+            String newTableName = headers.getFirst("table-name");
+            System.out.println(newTableName);
 
             //Create new table if table column name is not duplicate, and insert data into exsisting table if table column name duplicate
-//            if (createTable) {
-//                MapReader mapReader = new MapReader();
-//                String fileName = mapReader.cmprMapper(lowKey);
-//                System.out.println(fileName);
-//                if (fileName != null) {
-//                    List<String> columnList = mapReader.mapping(fileName);
-//                    serviceRepository.createTableWithMap(columnList, newTableName);
-//                } else {
-//                    serviceRepository.createTable(key, newTableName);
-//                    serviceRepository.insertData(dataList, newTableName);
-//                }
-//            } else {
-//                serviceRepository.insertData(dataList, newTableName);
-//            }
+            if (createTable) {
+                MapReader mapReader = new MapReader();
+                String fileName = mapReader.cmprMapper(lowKey);
+                if (fileName != null) {
+                    List<String> columnList = mapReader.mapping(fileName);
+                    serviceRepository.createTableWithMap(columnList, newTableName);
+                    serviceRepository.insertData(dataList, newTableName);
+                } else {
+                    serviceRepository.createTable(key, newTableName);
+                    serviceRepository.insertData(dataList, newTableName);
+                }
+            } else {
+                serviceRepository.insertData(dataList, newTableName);
+            }
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {
             String eMessage = "Failed to insert data!";
