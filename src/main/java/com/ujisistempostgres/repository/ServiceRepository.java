@@ -15,8 +15,7 @@ public class ServiceRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Map<String, Object>> getAllData() {
-        String tableName = "saleslineframe";
+    public List<Map<String, Object>> getAllData(String tableName) {
         String sql = String.format("SELECT * FROM %s", tableName);
         return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
             ResultSetMetaData metaData = resultSet.getMetaData();
@@ -133,7 +132,7 @@ public class ServiceRepository {
     public void createTableWithMap(List<String> columns, String tableName) {
         String column = String.join(",", columns);
         String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, column);
-        System.out.println("Succes create table");
+        System.out.println("Success create table");
         jdbcTemplate.update(sql);
     }
 

@@ -26,7 +26,7 @@ public class MapReader {
         for (Map<String, Object> result : mapResult) {
             columnList.add(result.get("columnName").toString() + " " + result.get("typeData"));
         }
-        System.out.println("mapping");
+        System.out.println(columnList);
         return columnList;
     }
 

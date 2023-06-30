@@ -26,9 +26,10 @@ public class ServiceController {
     }
 
     @GetMapping("/postgres")
-    public ResponseEntity<List<Map<String, Object>>> getAllData() {
+    public ResponseEntity<List<Map<String, Object>>> getAllData(@RequestHeader HttpHeaders headers) {
         try {
-            List<Map<String, Object>> dataList = serviceRepository.getAllData();
+            String tableName = headers.getFirst("table-name");
+            List<Map<String, Object>> dataList = serviceRepository.getAllData(tableName);
             return ResponseEntity.ok(dataList);
         } catch (Exception e) {
             String eMessage = "An error while retrieving data";
@@ -41,11 +42,6 @@ public class ServiceController {
             @RequestHeader HttpHeaders headers,
             @RequestBody List<Map<String, Object>> dataList) {
         try {
-//
-//            for (Map<String, Object> data : dataList) {
-//                System.out.println(data);
-//            }
-
 
             List<String> key = new ArrayList<>();
             for (Map<String, Object> data : dataList) {
