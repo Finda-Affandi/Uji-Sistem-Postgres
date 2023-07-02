@@ -38,6 +38,40 @@ public class ServiceRepository {
         }
     }
 
+    public List<List<Map<String, Object>>> getBothData(List<String> tableNames) {
+        try {
+            List<List<Map<String, Object>>> result = new ArrayList<>();
+
+            for (String tableName : tableNames) {
+                String sql = "SELECT * FROM " + tableName;
+
+                List<Map<String, Object>> dataList = jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+                    ResultSetMetaData metaData = resultSet.getMetaData();
+                    int columnCount = metaData.getColumnCount();
+
+                    Map<String, Object> dataMap = new HashMap<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        String columnName = metaData.getColumnName(i);
+                        Object columnValue = resultSet.getObject(i);
+                        dataMap.put(columnName, columnValue);
+                    }
+
+                    return dataMap;
+                });
+
+                result.add(dataList);
+            }
+
+            return result;
+        } catch (DataAccessException e) {
+            // Handle the exception here, such as logging or throwing a custom exception
+            e.printStackTrace();
+            return Collections.emptyList(); // Return an empty list or handle it according to your application's requirements
+        }
+    }
+
+
+
 
 
 //    public void insertData(Map<String, Object> dataMap) {
@@ -108,6 +142,32 @@ public class ServiceRepository {
     public List<String> getAllTableNames() {
         String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
         return jdbcTemplate.queryForList(query, String.class);
+    }
+
+    public List<String> getAllTableNamesForChoose() {
+        String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
+        List<Map<String, Object>> results = jdbcTemplate.queryForList(query);
+
+        List<String> tableNames = new ArrayList<>();
+        int count = 1;
+        for (Map<String, Object> row : results) {
+            String tableName = (String) row.get("tablename");
+            tableNames.add(count + ". " + tableName);
+            count++;
+        }
+
+        return tableNames;
+    }
+
+    public String[] getAllTableNamesForSelectByTable() {
+        String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
+        List<String> tableNameList = jdbcTemplate.queryForList(query, String.class);
+
+        // Convert List<String> to String[]
+        String[] tableNameArray = new String[tableNameList.size()];
+        tableNameArray = tableNameList.toArray(tableNameArray);
+
+        return tableNameArray;
     }
 
     public List<String> getColumnList(String table) {
