@@ -37,6 +37,18 @@ public class ServiceController {
         }
     }
 
+    @GetMapping("/getAllDataPostgres")
+    public ResponseEntity<List<Map<String, Object>>> getAllDataforService(@RequestHeader HttpHeaders headers) {
+        try {
+            String tableName = headers.getFirst("ab31saleslineframe");
+            List<Map<String, Object>> dataList = serviceRepository.getAllData(tableName);
+            return ResponseEntity.ok(dataList);
+        } catch (Exception e) {
+            String eMessage = "An error while retrieving data";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PostMapping("/postgres")
     public ResponseEntity<String> insertData(
             @RequestHeader HttpHeaders headers,

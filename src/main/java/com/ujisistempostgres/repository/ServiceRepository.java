@@ -16,21 +16,29 @@ public class ServiceRepository {
     }
 
     public List<Map<String, Object>> getAllData(String tableName) {
-        String sql = String.format("SELECT * FROM %s", tableName);
-        return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
+        try {
+            String sql = String.format("SELECT * FROM %s", tableName);
+            return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
 
-            Map<String, Object> dataMap = new HashMap<>();
-            for (int i = 1; i <= columnCount; i++) {
-                String columnName = metaData.getColumnName(i);
-                Object columnValue = resultSet.getObject(i);
-                dataMap.put(columnName, columnValue);
-            }
+                Map<String, Object> dataMap = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object columnValue = resultSet.getObject(i);
+                    dataMap.put(columnName, columnValue);
+                }
 
-            return dataMap;
-        });
+                return dataMap;
+            });
+        } catch (DataAccessException e) {
+            // Handle the exception here, such as logging or throwing a custom exception
+            e.printStackTrace();
+            return Collections.emptyList(); // Return an empty list or handle it according to your application's requirements
+        }
     }
+
+
 
 //    public void insertData(Map<String, Object> dataMap) {
 //        String tableName = "saleslineframe";
