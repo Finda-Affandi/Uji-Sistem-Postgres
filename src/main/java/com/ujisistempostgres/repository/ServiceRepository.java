@@ -32,9 +32,8 @@ public class ServiceRepository {
                 return dataMap;
             });
         } catch (DataAccessException e) {
-            // Handle the exception here, such as logging or throwing a custom exception
             e.printStackTrace();
-            return Collections.emptyList(); // Return an empty list or handle it according to your application's requirements
+            return Collections.emptyList();
         }
     }
 
@@ -64,9 +63,8 @@ public class ServiceRepository {
 
             return result;
         } catch (DataAccessException e) {
-            // Handle the exception here, such as logging or throwing a custom exception
             e.printStackTrace();
-            return Collections.emptyList(); // Return an empty list or handle it according to your application's requirements
+            return Collections.emptyList();
         }
     }
 
@@ -134,7 +132,7 @@ public class ServiceRepository {
 
         String sql = template + " VALUES " + joinAllValue;
 
-        jdbcTemplate.batchUpdate(sql);
+        jdbcTemplate.update(sql);
 
         System.out.println(sql);
     }
@@ -163,7 +161,6 @@ public class ServiceRepository {
         String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
         List<String> tableNameList = jdbcTemplate.queryForList(query, String.class);
 
-        // Convert List<String> to String[]
         String[] tableNameArray = new String[tableNameList.size()];
         tableNameArray = tableNameList.toArray(tableNameArray);
 

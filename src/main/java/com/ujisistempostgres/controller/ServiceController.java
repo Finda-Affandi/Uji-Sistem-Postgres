@@ -75,17 +75,14 @@ public class ServiceController {
             String[] tableNames = serviceRepository.getAllTableNamesForSelectByTable();
             List<Map<String, Object>> result = new ArrayList<>();
 
-            // Convert param to integer
             int paramIndex = Integer.parseInt(param) - 1;
 
-            // Check if paramIndex is a valid index
             if (paramIndex >= 0 && paramIndex < tableNames.length) {
                 String tableName = tableNames[paramIndex];
 
-                // Action for matching param and table name
                 Map<String, Object> paramMap = new HashMap<>();
                 List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(Collections.singletonList(tableName));
-                paramMap.put("Data : ", dataLists); // Add dataLists to the paramMap
+                paramMap.put("Data : ", dataLists);
                 result.add(paramMap);
             } else {
                 Map<String, Object> paramMap = new HashMap<>();
@@ -113,14 +110,11 @@ public class ServiceController {
                 key.addAll(data.keySet());
                 break;
             }
-            //Change column name from csv into lowercase
             listToLowercase convToLow = new listToLowercase();
             List<String> lowKey = convToLow.listLowercase(key);
 
-            //Get all table from DB
             List<String> tableName = serviceRepository.getAllTableNames();
 
-            //List for get compare result
             List<Boolean> isDuplicate = new ArrayList<>();
             for (String table : tableName) {
                 List<String> column = convToLow.listLowercase(serviceRepository.getColumnList(table));
@@ -132,14 +126,11 @@ public class ServiceController {
                 }
             }
 
-            //Check is column in database dublicate
             boolean createTable = !isDuplicate.contains(true);
 
-            //Get table name from request header (Based csv filename)
             String newTableName = headers.getFirst("table-name");
             System.out.println(newTableName);
 
-            //Create new table if table column name is not duplicate, and insert data into exsisting table if table column name duplicate
             if (createTable) {
                 MapReader mapReader = new MapReader();
                 String fileName = mapReader.cmprMapper(lowKey);
