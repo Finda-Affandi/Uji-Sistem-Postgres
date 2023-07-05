@@ -98,13 +98,15 @@ public class ServiceController {
 //        }
 //    }
 
-    @PostMapping("postgres")
+    @PostMapping("/postgres")
     public ResponseEntity<String> insertData(
             @RequestHeader HttpHeaders headers,
             @RequestBody List<Map<String, Object>> dataList
     ) {
         try {
+            System.out.println("insert");
             String table = headers.getFirst("table-name");
+            System.out.println(table);
             serviceRepository.insertData(dataList, table);
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {

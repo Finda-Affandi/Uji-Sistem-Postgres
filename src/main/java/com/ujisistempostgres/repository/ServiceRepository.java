@@ -127,14 +127,13 @@ public class ServiceRepository {
 
             allValue.add(wrapValue);
         }
+        System.out.println("cekkk");
 
         String joinAllValue = String.join(",", allValue);
 
         String sql = template + " VALUES " + joinAllValue;
 
         jdbcTemplate.update(sql);
-
-        System.out.println(sql);
     }
 
     public List<String> getAllTableNames() {
