@@ -36,65 +36,81 @@ public class ServiceController {
         }
     }
 
-    @GetMapping("/getAllDataPostgres")
-    public ResponseEntity<List<Map<String, Object>>> getAllDataforService(@RequestHeader HttpHeaders headers) {
-        try {
-            List<String> tableNames = serviceRepository.getAllTableNames();
-            List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(tableNames);
+//    @GetMapping("/getAllDataPostgres")
+//    public ResponseEntity<List<Map<String, Object>>> getAllDataforService(@RequestHeader HttpHeaders headers) {
+//        try {
+//            List<String> tableNames = serviceRepository.getAllTableNames();
+//            List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(tableNames);
+//
+//            List<Map<String, Object>> combinedData = new ArrayList<>();
+//            for (List<Map<String, Object>> dataList : dataLists) {
+//                combinedData.addAll(dataList);
+//            }
+//
+//            return ResponseEntity.ok(combinedData);
+//        } catch (Exception e) {
+//            String eMessage = "An error occurred while retrieving data";
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+//
+//    @GetMapping("/chooseTablePosgres")
+//    public ResponseEntity<List<String>> chooseTablePosgres(@RequestHeader HttpHeaders headers) {
+//        try {
+//            List<String> tableNames = serviceRepository.getAllTableNamesForChoose();
+//            return ResponseEntity.ok()
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .body(tableNames);
+//        } catch (Exception e) {
+//            String eMessage = "An error occurred while retrieving data";
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+//
+//    @GetMapping("/getByTablePostgres")
+//    public ResponseEntity<List<Map<String, Object>>> getByTablePostgres(
+//            @RequestHeader HttpHeaders headers,
+//            @RequestHeader("param") String param) {
+//        try {
+//            String[] tableNames = serviceRepository.getAllTableNamesForSelectByTable();
+//            List<Map<String, Object>> result = new ArrayList<>();
+//
+//            int paramIndex = Integer.parseInt(param) - 1;
+//
+//            if (paramIndex >= 0 && paramIndex < tableNames.length) {
+//                String tableName = tableNames[paramIndex];
+//
+//                Map<String, Object> paramMap = new HashMap<>();
+//                List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(Collections.singletonList(tableName));
+//                paramMap.put("Data : ", dataLists);
+//                result.add(paramMap);
+//            } else {
+//                Map<String, Object> paramMap = new HashMap<>();
+//                paramMap.put("param", param);
+//                paramMap.put("message", "Invalid param index: " + param);
+//                result.add(paramMap);
+//            }
+//
+//            return ResponseEntity.ok(result);
+//        } catch (Exception e) {
+//            String eMessage = "An error occurred while retrieving data";
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
-            List<Map<String, Object>> combinedData = new ArrayList<>();
-            for (List<Map<String, Object>> dataList : dataLists) {
-                combinedData.addAll(dataList);
-            }
-
-            return ResponseEntity.ok(combinedData);
-        } catch (Exception e) {
-            String eMessage = "An error occurred while retrieving data";
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/chooseTablePosgres")
-    public ResponseEntity<List<String>> chooseTablePosgres(@RequestHeader HttpHeaders headers) {
-        try {
-            List<String> tableNames = serviceRepository.getAllTableNamesForChoose();
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(tableNames);
-        } catch (Exception e) {
-            String eMessage = "An error occurred while retrieving data";
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @GetMapping("/getByTablePostgres")
-    public ResponseEntity<List<Map<String, Object>>> getByTablePostgres(
+    @PostMapping("postgres")
+    public ResponseEntity<String> insertData(
             @RequestHeader HttpHeaders headers,
-            @RequestHeader("param") String param) {
+            @RequestBody List<Map<String, Object>> dataList
+    ) {
         try {
-            String[] tableNames = serviceRepository.getAllTableNamesForSelectByTable();
-            List<Map<String, Object>> result = new ArrayList<>();
-
-            int paramIndex = Integer.parseInt(param) - 1;
-
-            if (paramIndex >= 0 && paramIndex < tableNames.length) {
-                String tableName = tableNames[paramIndex];
-
-                Map<String, Object> paramMap = new HashMap<>();
-                List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(Collections.singletonList(tableName));
-                paramMap.put("Data : ", dataLists);
-                result.add(paramMap);
-            } else {
-                Map<String, Object> paramMap = new HashMap<>();
-                paramMap.put("param", param);
-                paramMap.put("message", "Invalid param index: " + param);
-                result.add(paramMap);
-            }
-
-            return ResponseEntity.ok(result);
+            String table = headers.getFirst("table-name");
+            serviceRepository.insertData(dataList, table);
+            return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {
-            String eMessage = "An error occurred while retrieving data";
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            String eMessage = "Failed to insert data!";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(eMessage);
         }
     }
 
