@@ -99,62 +99,66 @@ public class ServiceController {
     }
 
 
-    @PostMapping("/postgres")
-    public ResponseEntity<String> insertData(
+//    @PostMapping("/postgres")
+//    public ResponseEntity<String> insertData(
+//            @RequestHeader HttpHeaders headers,
+//            @RequestBody List<Map<String, Object>> dataList) {
+//        try {
+//
+//            List<String> key = new ArrayList<>();
+//            for (Map<String, Object> data : dataList) {
+//                key.addAll(data.keySet());
+//                break;
+//            }
+//            listToLowercase convToLow = new listToLowercase();
+//            List<String> lowKey = convToLow.listLowercase(key);
+//
+//            List<String> tableName = serviceRepository.getAllTableNames();
+//
+//            List<Boolean> isDuplicate = new ArrayList<>();
+//            for (String table : tableName) {
+//                List<String> column = convToLow.listLowercase(serviceRepository.getColumnList(table));
+//                boolean cmpr = CompareList.compareLists(lowKey, column);
+//                if (cmpr) {
+//                    isDuplicate.add(true);
+//                } else {
+//                    isDuplicate.add(false);
+//                }
+//            }
+//
+//            boolean createTable = !isDuplicate.contains(true);
+//
+//            String newTableName = headers.getFirst("table-name");
+//            System.out.println(newTableName);
+//
+//            if (createTable) {
+//                MapReader mapReader = new MapReader();
+//                String fileName = mapReader.cmprMapper(lowKey);
+//                if (fileName != null) {
+//                    List<String> columnList = mapReader.mapping(fileName);
+//                    serviceRepository.createTableWithMap(columnList, newTableName);
+//                    serviceRepository.insertData(dataList, newTableName);
+//                } else {
+//                    serviceRepository.createTable(key, newTableName);
+//                    serviceRepository.insertData(dataList, newTableName);
+//                }
+//            } else {
+//                serviceRepository.insertData(dataList, newTableName);
+//            }
+//            return ResponseEntity.ok("Data inserted succesfully!");
+//        } catch (Exception e) {
+//            String eMessage = "Failed to insert data!";
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(eMessage);
+//        }
+//    }
+
+    @PostMapping("/postgres/create-table")
+    public void createTable(
             @RequestHeader HttpHeaders headers,
-            @RequestBody List<Map<String, Object>> dataList) {
-        try {
-
-            List<String> key = new ArrayList<>();
-            for (Map<String, Object> data : dataList) {
-                key.addAll(data.keySet());
-                break;
-            }
-            listToLowercase convToLow = new listToLowercase();
-            List<String> lowKey = convToLow.listLowercase(key);
-
-            List<String> tableName = serviceRepository.getAllTableNames();
-
-            List<Boolean> isDuplicate = new ArrayList<>();
-            for (String table : tableName) {
-                List<String> column = convToLow.listLowercase(serviceRepository.getColumnList(table));
-                boolean cmpr = CompareList.compareLists(lowKey, column);
-                if (cmpr) {
-                    isDuplicate.add(true);
-                } else {
-                    isDuplicate.add(false);
-                }
-            }
-
-            boolean createTable = !isDuplicate.contains(true);
-
-            String newTableName = headers.getFirst("table-name");
-            System.out.println(newTableName);
-
-            if (createTable) {
-                MapReader mapReader = new MapReader();
-                String fileName = mapReader.cmprMapper(lowKey);
-                if (fileName != null) {
-                    List<String> columnList = mapReader.mapping(fileName);
-                    serviceRepository.createTableWithMap(columnList, newTableName);
-                    serviceRepository.insertData(dataList, newTableName);
-                } else {
-                    serviceRepository.createTable(key, newTableName);
-                    serviceRepository.insertData(dataList, newTableName);
-                }
-            } else {
-                serviceRepository.insertData(dataList, newTableName);
-            }
-            return ResponseEntity.ok("Data inserted succesfully!");
-        } catch (Exception e) {
-            String eMessage = "Failed to insert data!";
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(eMessage);
-        }
-    }
-
-    @PostMapping("/coba")
-    public void cobah(@RequestBody List<Map<String, Object>> dataList){
-        serviceRepository.mencoba(dataList);
+            @RequestBody Map<String, Object> dataColumn)
+    {
+        String tableName = headers.getFirst("table-name");
+        serviceRepository.createTable(dataColumn, tableName);
     }
 }

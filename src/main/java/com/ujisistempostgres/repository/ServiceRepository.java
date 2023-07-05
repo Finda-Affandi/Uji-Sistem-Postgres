@@ -180,17 +180,22 @@ public class ServiceRepository {
         return columnList;
     }
 
-    public void createTable(List<String> columns, String tableName) {
+    public void createTable(Map<String, Object> columnList, String tableName) {
         List<String> column = new ArrayList<>();
-
-        for (String col : columns) {
-            String sqlCol = col + " VARCHAR(100)";
-            column.add(sqlCol);
+        List<String> columnAndType = new ArrayList<>();
+        column.addAll(columnList.keySet());
+        for (String col : column) {
+            if (col != "PRIMARY KEY") {
+                columnAndType.add(col + " " + columnList.get(col));
+            }
         }
 
-        String cols = String.join(", ", column);
+        columnAndType.add("PRIMARY KEY" + " " + columnList.get("PRIMARY KEY"));
+
+        String cols = String.join(",", columnAndType);
 
         String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, cols);
+        System.out.println(sql);
         jdbcTemplate.update(sql);
     }
 
