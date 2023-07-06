@@ -1,17 +1,15 @@
 package com.ujisistempostgres.controller;
 
-import com.ujisistempostgres.compareter.CompareList;
-import com.ujisistempostgres.converter.listToLowercase;
-import com.ujisistempostgres.mapper.MapReader;
 import com.ujisistempostgres.repository.ServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
@@ -24,35 +22,35 @@ public class ServiceController {
         this.serviceRepository = serviceRepository;
     }
 
-    @GetMapping("/postgres")
-    public ResponseEntity<List<Map<String, Object>>> getAllData(@RequestHeader HttpHeaders headers) {
-        try {
-            String tableName = headers.getFirst("table-name");
-            List<Map<String, Object>> dataList = serviceRepository.getAllData(tableName);
-            return ResponseEntity.ok(dataList);
-        } catch (Exception e) {
-            String eMessage = "An error while retrieving data";
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-//    @GetMapping("/getAllDataPostgres")
-//    public ResponseEntity<List<Map<String, Object>>> getAllDataforService(@RequestHeader HttpHeaders headers) {
+//    @GetMapping("/postgres")
+//    public ResponseEntity<List<Map<String, Object>>> getAllData(@RequestHeader HttpHeaders headers) {
 //        try {
-//            List<String> tableNames = serviceRepository.getAllTableNames();
-//            List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(tableNames);
-//
-//            List<Map<String, Object>> combinedData = new ArrayList<>();
-//            for (List<Map<String, Object>> dataList : dataLists) {
-//                combinedData.addAll(dataList);
-//            }
-//
-//            return ResponseEntity.ok(combinedData);
+//            String tableName = headers.getFirst("table-name");
+//            List<Map<String, Object>> dataList = serviceRepository.getAllData(tableName);
+//            return ResponseEntity.ok(dataList);
 //        } catch (Exception e) {
-//            String eMessage = "An error occurred while retrieving data";
+//            String eMessage = "An error while retrieving data";
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 //        }
 //    }
+
+    @GetMapping("/postgres")
+    public ResponseEntity<List<Map<String, Object>>> getAllDataforService(@RequestHeader HttpHeaders headers) {
+        try {
+            List<String> tableNames = serviceRepository.getAllTableNames();
+            List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(tableNames);
+
+            List<Map<String, Object>> combinedData = new ArrayList<>();
+            for (List<Map<String, Object>> dataList : dataLists) {
+                combinedData.addAll(dataList);
+            }
+
+            return ResponseEntity.ok(combinedData);
+        } catch (Exception e) {
+            String eMessage = "An error occurred while retrieving data";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 //
 //    @GetMapping("/chooseTablePosgres")
 //    public ResponseEntity<List<String>> chooseTablePosgres(@RequestHeader HttpHeaders headers) {
