@@ -127,7 +127,6 @@ public class ServiceRepository {
 
             allValue.add(wrapValue);
         }
-        System.out.println("cekkk");
 
         String joinAllValue = String.join(",", allValue);
 
@@ -194,7 +193,6 @@ public class ServiceRepository {
         String cols = String.join(",", columnAndType);
 
         String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, cols);
-        System.out.println(sql);
         jdbcTemplate.update(sql);
     }
 

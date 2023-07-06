@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,8 @@ public class ServiceController {
     public ServiceController(ServiceRepository serviceRepository) {
         this.serviceRepository = serviceRepository;
     }
+
+    Map<String, Object> dataTypeMapping = new HashMap<>();
 
 //    @GetMapping("/postgres")
 //    public ResponseEntity<List<Map<String, Object>>> getAllData(@RequestHeader HttpHeaders headers) {
@@ -102,9 +105,7 @@ public class ServiceController {
             @RequestBody List<Map<String, Object>> dataList
     ) {
         try {
-            System.out.println("insert");
             String table = headers.getFirst("table-name");
-            System.out.println(table);
             serviceRepository.insertData(dataList, table);
             return ResponseEntity.ok("Data inserted succesfully!");
         } catch (Exception e) {
@@ -175,6 +176,14 @@ public class ServiceController {
             @RequestBody Map<String, Object> dataColumn)
     {
         String tableName = headers.getFirst("table-name");
-        serviceRepository.createTable(dataColumn, tableName);
+        dataTypeMapping.put(tableName, dataColumn);
+    }
+
+    @PostMapping("/postgrescoba")
+    public void coba(
+            @RequestHeader HttpHeaders headers)
+    {
+        System.out.println(dataTypeMapping);
+
     }
 }
