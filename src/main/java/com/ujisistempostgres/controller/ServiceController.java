@@ -35,19 +35,23 @@ public class ServiceController {
 //    }
 
     @GetMapping("/postgres")
-    public ResponseEntity<List<Map<String, Object>>> getAllDataforService(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<String> getAllDataforService(@RequestHeader HttpHeaders headers) {
         try {
             List<String> tableNames = serviceRepository.getAllTableNames();
+            long startTime = System.currentTimeMillis(); // Waktu mulai
             List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(tableNames);
+            long endTime = System.currentTimeMillis(); // Waktu selesai
+            long duration = endTime - startTime; // Durasi akses (dalam milidetik)
+            String waktu = duration + "ms";
 
             List<Map<String, Object>> combinedData = new ArrayList<>();
             for (List<Map<String, Object>> dataList : dataLists) {
                 combinedData.addAll(dataList);
             }
 
-            return ResponseEntity.ok(combinedData);
+            return ResponseEntity.ok(combinedData + "\n" + waktu);
         } catch (Exception e) {
-            String eMessage = "An error occurred while retrieving data";
+            String eMessage = "Terjadi kesalahan saat mengambil data";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -105,8 +109,12 @@ public class ServiceController {
             System.out.println("insert");
             String table = headers.getFirst("table-name");
             System.out.println(table);
+            long startTime = System.currentTimeMillis(); // Waktu mulai
             serviceRepository.insertData(dataList, table);
-            return ResponseEntity.ok("Data inserted succesfully!");
+            long endTime = System.currentTimeMillis(); // Waktu selesai
+            long duration = endTime - startTime; // Durasi akses (dalam milidetik)
+            return ResponseEntity.ok(table + " Waktu : " + duration + "ms");
+
         } catch (Exception e) {
             String eMessage = "Failed to insert data!";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -170,11 +178,17 @@ public class ServiceController {
 //    }
 
     @PostMapping("/postgres/create-table")
-    public void createTable(
+    public ResponseEntity<String> createTable(
             @RequestHeader HttpHeaders headers,
-            @RequestBody Map<String, Object> dataColumn)
-    {
+            @RequestBody Map<String, Object> dataColumn) {
         String tableName = headers.getFirst("table-name");
+        long startTime = System.currentTimeMillis(); // Waktu mulai
         serviceRepository.createTable(dataColumn, tableName);
+        long endTime = System.currentTimeMillis(); // Waktu selesai
+        long duration = endTime - startTime; // Durasi akses (dalam milidetik)
+
+        return ResponseEntity.ok("Waktu : " + duration + "ms");
     }
+
 }
+
