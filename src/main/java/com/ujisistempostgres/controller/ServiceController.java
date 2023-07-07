@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -101,26 +102,34 @@ public class ServiceController {
 //    }
 
     @PostMapping("/postgres")
-    public ResponseEntity<String> insertData(
+    public ResponseEntity<Map<String, Object>> insertData(
             @RequestHeader HttpHeaders headers,
             @RequestBody List<Map<String, Object>> dataList
     ) {
         try {
-            System.out.println("insert");
+            System.out.println(dataList.size());
             String table = headers.getFirst("table-name");
-            System.out.println(table);
+//            System.out.println(table);
             long startTime = System.currentTimeMillis(); // Waktu mulai
             serviceRepository.insertData(dataList, table);
             long endTime = System.currentTimeMillis(); // Waktu selesai
             long duration = endTime - startTime; // Durasi akses (dalam milidetik)
-            return ResponseEntity.ok(table + " Waktu : " + duration + "ms");
 
+            Map<String, Object> response = new HashMap<>();
+            response.put("table", table);
+            response.put("duration", duration);
+            response.put("row", dataList.size());
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             String eMessage = "Failed to insert data!";
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", eMessage);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(eMessage);
+                    .body(errorResponse);
         }
     }
+
 
 
 //    @PostMapping("/postgres")
@@ -178,7 +187,7 @@ public class ServiceController {
 //    }
 
     @PostMapping("/postgres/create-table")
-    public ResponseEntity<String> createTable(
+    public ResponseEntity<Map<String, Object>> createTable(
             @RequestHeader HttpHeaders headers,
             @RequestBody Map<String, Object> dataColumn) {
         String tableName = headers.getFirst("table-name");
@@ -186,8 +195,12 @@ public class ServiceController {
         serviceRepository.createTable(dataColumn, tableName);
         long endTime = System.currentTimeMillis(); // Waktu selesai
         long duration = endTime - startTime; // Durasi akses (dalam milidetik)
+        Map<String, Object> response = new HashMap<>();
+        response.put("table", tableName);
+        response.put("duration", duration);
+        response.put("row", dataColumn.size());
 
-        return ResponseEntity.ok("Waktu : " + duration + "ms");
+        return ResponseEntity.ok(response);
     }
 
 }
