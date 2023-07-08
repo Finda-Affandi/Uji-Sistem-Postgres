@@ -98,5 +98,9 @@ public class ServiceRepository {
         jdbcTemplate.update(sql);
     }
 
-
+    public void truncateTable( String tableName ) {
+        String query = "TRUNCATE TABLE " + tableName + ";";
+        jdbcTemplate.update(query);
+    }
+    
 }

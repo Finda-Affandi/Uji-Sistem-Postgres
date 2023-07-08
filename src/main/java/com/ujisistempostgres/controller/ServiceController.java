@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +90,13 @@ public class ServiceController {
         response.put("row", dataColumn.size());
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/postgres/truncate")
+    public ResponseEntity<String> truncateTable(@RequestHeader HttpHeaders headers) {
+        String tableName = headers.getFirst("table-name");
+        serviceRepository.truncateTable(tableName);
+        return ResponseEntity.ok(tableName);
     }
 
 }
