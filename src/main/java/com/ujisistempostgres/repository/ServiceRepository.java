@@ -1,5 +1,6 @@
 package com.ujisistempostgres.repository;
 
+import com.ujisistempostgres.converter.DateConverter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,43 +16,37 @@ public class ServiceRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<List<Map<String, Object>>> getBothData(List<String> tableNames) {
+    public List<Map<String, Object>> getBothData(String tableName) {
         try {
-            List<List<Map<String, Object>>> result = new ArrayList<>();
+            String sql = "SELECT * FROM " + tableName;
+            return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
+                ResultSetMetaData metaData = resultSet.getMetaData();
+                int columnCount = metaData.getColumnCount();
 
-            for (String tableName : tableNames) {
-                String sql = "SELECT * FROM " + tableName;
+                Map<String, Object> dataMap = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = metaData.getColumnName(i);
+                    Object columnValue = resultSet.getObject(i);
+                    dataMap.put(columnName, columnValue);
+                }
 
-                List<Map<String, Object>> dataList = jdbcTemplate.query(sql, (resultSet, rowNum) -> {
-                    ResultSetMetaData metaData = resultSet.getMetaData();
-                    int columnCount = metaData.getColumnCount();
-
-                    Map<String, Object> dataMap = new HashMap<>();
-                    for (int i = 1; i <= columnCount; i++) {
-                        String columnName = metaData.getColumnName(i);
-                        Object columnValue = resultSet.getObject(i);
-                        dataMap.put(columnName, columnValue);
-                    }
-
-                    return dataMap;
-                });
-
-                result.add(dataList);
-            }
-
-            return result;
+                return dataMap;
+            });
         } catch (DataAccessException e) {
             e.printStackTrace();
             return Collections.emptyList();
         }
     }
 
-    public void insertData(List<Map<String,Object>> dataList, String tableName) {
+    public void insertData(List<Map<String,Object>> dataList, Map<String, Object> dataType, String tableName) {
         List<String> column = new ArrayList<>();
+        DateConverter dateConverter = new DateConverter();
+
         for (Map<String, Object> data : dataList) {
             column.addAll(data.keySet());
             break;
         }
+
         String colName = String.join(",", column);
         String template = "INSERT INTO" + " " + tableName + " " + "(" + colName +")";
 
@@ -59,20 +54,24 @@ public class ServiceRepository {
         List<String> value = new ArrayList<>();
         for (Map<String, Object> data : dataList) {
             value.clear();
-            for (Object obj : data.values()) {
-                value.add("'" + obj.toString() + "'");
+            for (Object type : dataType.keySet()) {
+                if (Objects.equals(dataType.get(type).toString(), "int")) {
+                    value.add(data.get(type).toString());
+                } else if (Objects.equals(dataType.get(type).toString(), "varchar")) {
+                    value.add("'" + data.get(type).toString() + "'");
+                } else if (Objects.equals(dataType.get(type).toString(), "date")) {
+                    value.add("'" + dateConverter.cassandraDate(data.get(type).toString()) + "'");
+                } else if (Objects.equals(dataType.get(type).toString(), "float")) {
+                    value.add(data.get(type).toString());
+                }
             }
+
             String joinValue = String.join(",", value);
             String wrapValue = "(" + joinValue +")";
 
-            allValue.add(wrapValue);
+            String sql = template + " VALUES " + wrapValue;
+            jdbcTemplate.update(sql);
         }
-
-        String joinAllValue = String.join(",", allValue);
-
-        String sql = template + " VALUES " + joinAllValue;
-
-        jdbcTemplate.update(sql);
     }
 
     public List<String> getAllTableNames() {

@@ -23,23 +23,24 @@ public class ServiceController {
         this.serviceRepository = serviceRepository;
     }
 
+    Map<String, Object> dataTypeMapping = new HashMap<>();
+
 
     @GetMapping("/postgres")
-    public ResponseEntity<String> getAllDataforService(@RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Map<String, Object>> getAllDataforService(@RequestHeader HttpHeaders headers) {
         try {
-            List<String> tableNames = serviceRepository.getAllTableNames();
+            String tableName = headers.getFirst("table-name");
             long startTime = System.currentTimeMillis(); // Waktu mulai
-            List<List<Map<String, Object>>> dataLists = serviceRepository.getBothData(tableNames);
+            List<Map<String, Object>> dataLists = serviceRepository.getBothData(tableName);
             long endTime = System.currentTimeMillis(); // Waktu selesai
             long duration = endTime - startTime; // Durasi akses (dalam milidetik)
-            String waktu = duration + "ms";
+            String waktu = duration + " ms";
 
-            List<Map<String, Object>> combinedData = new ArrayList<>();
-            for (List<Map<String, Object>> dataList : dataLists) {
-                combinedData.addAll(dataList);
-            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("data", dataLists);
+            result.put("time", waktu);
 
-            return ResponseEntity.ok(combinedData + "\n" + waktu);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
             String eMessage = "Terjadi kesalahan saat mengambil data";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -53,8 +54,9 @@ public class ServiceController {
     ) {
         try {
             String table = headers.getFirst("table-name");
+            Map<String, Object> dataMap = (Map<String, Object>) dataTypeMapping.get(table);
             long startTime = System.currentTimeMillis(); // Waktu mulai
-            serviceRepository.insertData(dataList, table);
+            serviceRepository.insertData(dataList, dataMap, table);
             long endTime = System.currentTimeMillis(); // Waktu selesai
             long duration = endTime - startTime; // Durasi akses (dalam milidetik)
 
@@ -80,6 +82,7 @@ public class ServiceController {
         String tableName = headers.getFirst("table-name");
         long startTime = System.currentTimeMillis(); // Waktu mulai
         serviceRepository.createTable(dataColumn, tableName);
+        dataTypeMapping.put(tableName, dataColumn);
         long endTime = System.currentTimeMillis(); // Waktu selesai
         long duration = endTime - startTime; // Durasi akses (dalam milidetik)
         Map<String, Object> response = new HashMap<>();
