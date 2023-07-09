@@ -33,11 +33,10 @@ public class ServiceController {
             List<Map<String, Object>> dataLists = serviceRepository.getBothData(tableName);
             long endTime = System.currentTimeMillis(); // Waktu selesai
             long duration = endTime - startTime; // Durasi akses (dalam milidetik)
-            String waktu = duration + " ms";
 
             Map<String, Object> result = new HashMap<>();
             result.put("data", dataLists);
-            result.put("time", waktu);
+            result.put("time", String.valueOf(duration));
 
             return ResponseEntity.ok(result);
         } catch (Exception e) {
@@ -61,8 +60,8 @@ public class ServiceController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("table", table);
-            response.put("duration", duration);
-            response.put("row", dataList.size());
+            response.put("duration", String.valueOf(duration));
+            response.put("row", String.valueOf(dataList.size()));
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
