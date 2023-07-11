@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//dava
 @CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api")
@@ -22,81 +23,74 @@ public class ServiceController {
         this.serviceRepository = serviceRepository;
     }
 
-    Map<String, Object> dataTypeMapping = new HashMap<>();
 
 
-    @GetMapping("/postgres")
-    public ResponseEntity<Map<String, Object>> getAllDataforService(@RequestHeader HttpHeaders headers) {
+    @GetMapping("/mahasiswa")
+    public ResponseEntity<List<Map<String, Object>>> getAllDataforService() {
         try {
-            String tableName = headers.getFirst("table-name");
-            long startTime = System.currentTimeMillis(); // Waktu mulai
+            String tableName = "mahasiswa";
             List<Map<String, Object>> dataLists = serviceRepository.getBothData(tableName);
-            long endTime = System.currentTimeMillis(); // Waktu selesai
-            long duration = endTime - startTime; // Durasi akses (dalam milidetik)
 
-            Map<String, Object> result = new HashMap<>();
-            result.put("data", dataLists);
-            result.put("time", String.valueOf(duration));
-
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(dataLists);
         } catch (Exception e) {
             String eMessage = "Terjadi kesalahan saat mengambil data";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PostMapping("/postgres")
-    public ResponseEntity<Map<String, Object>> insertData(
-            @RequestHeader HttpHeaders headers,
+    @PostMapping("/mahasiswa")
+    public ResponseEntity<String> insertData(
             @RequestBody List<Map<String, Object>> dataList
     ) {
         try {
-            String table = headers.getFirst("table-name");
-            Map<String, Object> dataMap = (Map<String, Object>) dataTypeMapping.get(table);
-            long startTime = System.currentTimeMillis(); // Waktu mulai
-            serviceRepository.insertData(dataList, dataMap, table);
-            long endTime = System.currentTimeMillis(); // Waktu selesai
-            long duration = endTime - startTime; // Durasi akses (dalam milidetik)
+            String table = ("mahasiswa");
+            serviceRepository.insertData(dataList, table);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("table", table);
-            response.put("duration", String.valueOf(duration));
-            response.put("row", String.valueOf(dataList.size()));
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok("Berhasil menambah Data!");
         } catch (Exception e) {
             String eMessage = "Failed to insert data!";
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", eMessage);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(errorResponse);
+                    .body(errorResponse.toString());
         }
     }
 
-    @PostMapping("/postgres/create-table")
-    public ResponseEntity<Map<String, Object>> createTable(
-            @RequestHeader HttpHeaders headers,
-            @RequestBody Map<String, Object> dataColumn) {
-        String tableName = headers.getFirst("table-name");
-        long startTime = System.currentTimeMillis(); // Waktu mulai
-        serviceRepository.createTable(dataColumn, tableName);
-        dataTypeMapping.put(tableName, dataColumn);
-        long endTime = System.currentTimeMillis(); // Waktu selesai
-        long duration = endTime - startTime; // Durasi akses (dalam milidetik)
-        Map<String, Object> response = new HashMap<>();
-        response.put("table", tableName);
-        response.put("duration", duration);
-        response.put("row", dataColumn.size());
+    @PutMapping("/mahasiswa/{id}")
+    public ResponseEntity<String> updateData(
+            @PathVariable("id") String id,
+            @RequestBody Map<String, Object> newData
+    ) {
+        try {
+            String table = "mahasiswa";
+            serviceRepository.updateData(id, newData, table);
 
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok("Data berhasil diperbarui!");
+        } catch (Exception e) {
+            String eMessage = "Gagal memperbarui data!";
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", eMessage);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorResponse.toString());
+        }
     }
 
-    @DeleteMapping("/postgres/truncate")
-    public ResponseEntity<String> truncateTable(@RequestHeader HttpHeaders headers) {
-        String tableName = headers.getFirst("table-name");
-        serviceRepository.truncateTable(tableName);
-        return ResponseEntity.ok(tableName);
+    @DeleteMapping("/mahasiswa/{id}")
+    public ResponseEntity<String> deleteData(@PathVariable("id") String id) {
+        try {
+            String table = "mahasiswa";
+            serviceRepository.deleteData(id, table);
+
+            return ResponseEntity.ok("Data berhasil dihapus!");
+        } catch (Exception e) {
+            String eMessage = "Gagal menghapus data!";
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", eMessage);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(errorResponse.toString());
+        }
     }
+
 
 }
 

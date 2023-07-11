@@ -1,6 +1,5 @@
 package com.ujisistempostgres.repository;
 
-import com.ujisistempostgres.converter.DateConverter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -38,9 +37,8 @@ public class ServiceRepository {
         }
     }
 
-    public void insertData(List<Map<String,Object>> dataList, Map<String, Object> dataType, String tableName) {
+    public void insertData(List<Map<String,Object>> dataList, String tableName) {
         List<String> column = new ArrayList<>();
-        DateConverter dateConverter = new DateConverter();
 
         for (Map<String, Object> data : dataList) {
             column.addAll(data.keySet());
@@ -54,53 +52,41 @@ public class ServiceRepository {
         List<String> value = new ArrayList<>();
         for (Map<String, Object> data : dataList) {
             value.clear();
-            for (Object type : dataType.keySet()) {
-                if (Objects.equals(dataType.get(type).toString(), "int")) {
-                    value.add(data.get(type).toString());
-                } else if (Objects.equals(dataType.get(type).toString(), "varchar")) {
-                    value.add("'" + data.get(type).toString() + "'");
-                } else if (Objects.equals(dataType.get(type).toString(), "date")) {
-                    value.add("'" + dateConverter.cassandraDate(data.get(type).toString()) + "'");
-                } else if (Objects.equals(dataType.get(type).toString(), "float")) {
-                    value.add(data.get(type).toString());
-                }
+            for (String col : data.keySet()) {
+                value.add("'" + data.get(col).toString() + "'");
             }
 
             String joinValue = String.join(",", value);
             String wrapValue = "(" + joinValue +")";
 
             String sql = template + " VALUES " + wrapValue;
+            System.out.println(sql);
             jdbcTemplate.update(sql);
         }
     }
 
-    public List<String> getAllTableNames() {
-        String query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public';";
-        return jdbcTemplate.queryForList(query, String.class);
-    }
-
-
-    public void createTable(Map<String, Object> columnList, String tableName) {
+    public void updateData (String nim, Map<String, Object> newData, String table) {
         List<String> column = new ArrayList<>();
-        List<String> columnAndType = new ArrayList<>();
-        column.addAll(columnList.keySet());
+        List<String> columnQuery = new ArrayList<>();
+        column.addAll(newData.keySet());
+
+        String colName = String.join(",", column);
+        String template = "UPDATE" + " " + table + " " + "SET ";
+
         for (String col : column) {
-            if (col != "PRIMARY KEY") {
-                columnAndType.add(col + " " + columnList.get(col));
-            }
+            columnQuery.add(col + " = " + "'" + newData.get(col) + "'");
         }
 
-        columnAndType.add("PRIMARY KEY" + " " + columnList.get("PRIMARY KEY"));
+        String joinValue = String.join(",", columnQuery);
 
-        String cols = String.join(",", columnAndType);
+        String sql = template + joinValue + " WHERE nim = " + "'" + nim + "'";
 
-        String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%S)", tableName, cols);
         jdbcTemplate.update(sql);
     }
 
-    public void truncateTable( String tableName ) {
-        String query = "TRUNCATE TABLE " + tableName + ";";
-        jdbcTemplate.update(query);
+    public void deleteData (String nim, String table) {
+        String sql = "DELETE FROM " + table + " WHERE nim = " + "'" + nim + "'";
+        jdbcTemplate.update(sql);
     }
     
 }
